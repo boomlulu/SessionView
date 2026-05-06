@@ -1,0 +1,2 @@
+{"type":"user","sessionId":"second-session","cwd":"/tmp/second-project","timestamp":"2026-01-04T12:00:00Z","message":{"role":"user","content":"Search should also find the atlas deployment decision."}}
+{"type":"assistant","sessionId":"second-session","cwd":"/tmp/second-project","timestamp":"2026-01-04T12:01:00Z","message":{"role":"assistant","content":"Atlas deployment belongs to the second project."}}

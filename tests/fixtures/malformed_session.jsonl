@@ -1,0 +1,3 @@
+{"type":"user","sessionId":"bad-session","cwd":"/tmp/bad-project","timestamp":"2026-01-03T11:00:00Z","message":{"role":"user","content":"Find the broken transcript but keep indexing orchid."}}
+this is not json
+{"type":"assistant","sessionId":"bad-session","cwd":"/tmp/bad-project","timestamp":"2026-01-03T11:02:00Z","message":{"role":"assistant","content":[{"type":"text","text":"The malformed row was skipped."}]}}

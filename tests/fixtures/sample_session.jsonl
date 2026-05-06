@@ -1,0 +1,2 @@
+{"type":"user","sessionId":"sample-session","cwd":"/tmp/sample-project","timestamp":"2026-01-02T10:00:00Z","uuid":"u1","message":{"role":"user","content":[{"type":"text","text":"Please plan the nebula cache migration and remember the fixture keyword orchid."}]}}
+{"type":"assistant","sessionId":"sample-session","cwd":"/tmp/sample-project","timestamp":"2026-01-02T10:01:00Z","uuid":"a1","parentUuid":"u1","message":{"role":"assistant","content":[{"type":"text","text":"We can index the orchid migration notes, then expose search snippets."}]}}
