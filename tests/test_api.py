@@ -1,4 +1,5 @@
 from pathlib import Path
+import time
 
 from fastapi.testclient import TestClient
 
@@ -38,3 +39,24 @@ def test_api_lists_csv_languages(tmp_path):
     assert response.status_code == 200
     codes = {item["code"] for item in response.json()}
     assert {"en", "zh"}.issubset(codes)
+
+
+def test_api_async_scan_status(tmp_path):
+    client = TestClient(create_app(str(tmp_path / "index.sqlite")))
+
+    started = client.post("/api/scan/start", json={"roots": [str(FIXTURES)], "rebuild": True})
+    assert started.status_code == 200
+    assert started.json()["roots"][0]["exists"] is True
+
+    status = started.json()
+    for _ in range(20):
+        status = client.get("/api/scan/status").json()
+        if not status["running"]:
+            break
+        time.sleep(0.05)
+
+    assert status["phase"] == "done"
+    assert status["total_files"] == 3
+    assert status["scanned_files"] == 3
+    assert status["indexed_sessions"] == 3
+    assert status["session_count"] == 3

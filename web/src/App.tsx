@@ -1,6 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { Database } from "lucide-react";
-import { getHealth, getProjects, getSession, scan, searchSessions, type Health, type SessionDetail, type SessionSummary } from "./api";
+import {
+  getHealth,
+  getProjects,
+  getScanStatus,
+  getSession,
+  searchSessions,
+  startScan,
+  type Health,
+  type ScanStatus,
+  type SessionDetail,
+  type SessionSummary
+} from "./api";
+import { ScanStatusPanel } from "./components/ScanStatusPanel";
 import { SearchBar } from "./components/SearchBar";
 import { SessionDetailView } from "./components/SessionDetail";
 import { SessionList } from "./components/SessionList";
@@ -18,6 +30,7 @@ export function App() {
   const [loading, setLoading] = useState(true);
   const [detailLoading, setDetailLoading] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
+  const [scanStatus, setScanStatus] = useState<ScanStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [statusKey, setStatusKey] = useState("app.ready");
   const [statusValues, setStatusValues] = useState<Record<string, string | number> | undefined>();
@@ -26,6 +39,23 @@ export function App() {
   useEffect(() => {
     void refreshStatus();
   }, []);
+
+  useEffect(() => {
+    getScanStatus()
+      .then((status) => {
+        setScanStatus(status);
+        setIsScanning(status.running);
+      })
+      .catch(() => undefined);
+  }, []);
+
+  useEffect(() => {
+    if (!isScanning) return;
+    const timer = window.setInterval(() => {
+      void pollScanStatus();
+    }, 600);
+    return () => window.clearInterval(timer);
+  }, [isScanning]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -98,17 +128,44 @@ export function App() {
     setStatusKey("app.scanning");
     setStatusValues(undefined);
     try {
-      const report = await scan(false);
-      await refreshStatus();
-      setStatusKey("app.scanComplete");
-      setStatusValues({ indexed: report.indexed_sessions, files: report.scanned_files });
+      const status = await startScan(false);
+      setScanStatus(status);
+      if (!status.running) {
+        await finishScan(status);
+      }
     } catch (err) {
       setError(readableError(err));
       setStatusKey("app.scanFailed");
       setStatusValues(undefined);
-    } finally {
       setIsScanning(false);
     }
+  }
+
+  async function pollScanStatus() {
+    try {
+      const status = await getScanStatus();
+      setScanStatus(status);
+      if (!status.running) {
+        await finishScan(status);
+      }
+    } catch (err) {
+      setError(readableError(err));
+      setStatusKey("app.scanFailed");
+      setStatusValues(undefined);
+      setIsScanning(false);
+    }
+  }
+
+  async function finishScan(status: ScanStatus) {
+    setIsScanning(false);
+    if (status.phase === "failed") {
+      setStatusKey("app.scanFailed");
+      setStatusValues(undefined);
+      return;
+    }
+    await refreshStatus();
+    setStatusKey("app.scanComplete");
+    setStatusValues({ indexed: status.indexed_sessions, files: status.scanned_files });
   }
 
   async function handleCopy(command: string) {
@@ -142,6 +199,7 @@ export function App() {
         />
       </header>
       <div className="statusBar">{t(statusKey, statusValues)}</div>
+      <ScanStatusPanel status={scanStatus} t={t} />
       <div className="contentGrid">
         <SessionList
           sessions={sessions}

@@ -40,6 +40,21 @@ export type ScanReport = {
   warnings: string[];
 };
 
+export type ScanStatus = {
+  running: boolean;
+  phase: "idle" | "starting" | "discovering" | "indexing" | "done" | "failed";
+  roots: { path: string; exists: boolean }[];
+  total_files: number;
+  scanned_files: number;
+  indexed_sessions: number;
+  current_file: string | null;
+  warnings: string[];
+  error: string | null;
+  started_at: string | null;
+  finished_at: string | null;
+  session_count: number;
+};
+
 export type LanguageOption = {
   code: string;
   name: string;
@@ -77,6 +92,17 @@ export function scan(rebuild = false) {
     method: "POST",
     body: JSON.stringify({ rebuild })
   });
+}
+
+export function startScan(rebuild = false) {
+  return request<ScanStatus>("/api/scan/start", {
+    method: "POST",
+    body: JSON.stringify({ rebuild })
+  });
+}
+
+export function getScanStatus() {
+  return request<ScanStatus>("/api/scan/status");
 }
 
 export function searchSessions(query: string, project: string) {

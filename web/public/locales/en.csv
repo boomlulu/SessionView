@@ -16,6 +16,21 @@ project.all,All projects
 scan.title,Scan transcripts
 scan.button,Scan
 scan.scanning,Scanning
+scan.panelAria,Scan status
+scan.phase.idle,Scan idle
+scan.phase.starting,Starting scan
+scan.phase.discovering,Finding transcript files
+scan.phase.indexing,Indexing transcripts
+scan.phase.done,Scan complete
+scan.phase.failed,Scan failed
+scan.progress,"{scanned} / {total} files"
+scan.roots,Scan roots
+scan.rootExists,found
+scan.rootMissing,missing
+scan.currentFile,Current file
+scan.noCurrentFile,No file is being scanned
+scan.counts,"{indexed} sessions indexed, {warnings} warnings"
+scan.warnings,"{count} warnings"
 status.loadingSessions,Loading sessions...
 status.noSessions,No sessions yet. Scan transcripts or try another keyword.
 list.aria,Session results

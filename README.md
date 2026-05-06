@@ -30,6 +30,8 @@ The index database defaults to `~/.cc-session-manager/index.sqlite`. Override it
 
 Open `http://127.0.0.1:8765`, click scan, search by keyword, filter by project, open a session detail, and copy the generated `claude --resume <session-id>` command.
 
+The scan status panel shows the roots being scanned, whether each root exists, the current phase, current file, indexed count, and recent warnings. The UI uses `POST /api/scan/start` and polls `GET /api/scan/status`; the original synchronous `POST /api/scan` remains available for scripts and tests.
+
 ## Languages
 
 The UI loads translations from CSV files in `web/public/locales/`. English and Chinese are included by default.

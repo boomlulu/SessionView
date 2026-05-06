@@ -38,6 +38,14 @@ def create_app(db_path: Optional[str] = None) -> FastAPI:
     def api_scan(request: ScanRequest):
         return services.run_scan(request.roots, request.rebuild, effective_db)
 
+    @app.post("/api/scan/start")
+    def api_scan_start(request: ScanRequest):
+        return services.start_scan(request.roots, request.rebuild, effective_db)
+
+    @app.get("/api/scan/status")
+    def api_scan_status():
+        return services.scan_status(effective_db)
+
     @app.get("/api/sessions")
     def api_sessions(project: Optional[str] = None, limit: int = 100):
         return services.sessions(project=project, limit=limit, db_path=effective_db)
