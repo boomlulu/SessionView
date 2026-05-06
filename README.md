@@ -30,4 +30,10 @@ The index database defaults to `~/.cc-session-manager/index.sqlite`. Override it
 
 Open `http://127.0.0.1:8765`, click scan, search by keyword, filter by project, open a session detail, and copy the generated `claude --resume <session-id>` command.
 
+## Languages
+
+The UI loads translations from CSV files in `web/public/locales/`. English and Chinese are included by default.
+
+To add another language without changing code, add a CSV file such as `web/public/locales/ja.csv` with the same `key,value` columns. After building, the file is copied to `web/dist/locales/`; for an already built deployment, place the new CSV in `web/dist/locales/`.
+
 The MVP is local-only. It does not call remote LLMs, does not modify transcript files, and does not execute resume commands from the browser.

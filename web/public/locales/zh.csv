@@ -1,0 +1,36 @@
+key,value
+__language_name,Chinese
+__language_native_name,中文
+app.ready,就绪
+app.apiUnavailable,API 不可用
+app.scanning,正在扫描会话
+app.scanFailed,扫描失败
+app.indexUnknown,索引状态未知
+app.indexedSessions,已索引 {count} 个会话
+app.scanComplete,已从 {files} 个文件导入 {indexed} 个会话
+brand.name,SessionView
+search.placeholder,搜索会话
+search.aria,搜索会话
+project.aria,项目
+project.all,全部项目
+scan.title,扫描 transcript
+scan.button,扫描
+scan.scanning,扫描中
+status.loadingSessions,正在加载会话...
+status.noSessions,还没有会话。请先扫描 transcript，或换个关键词试试。
+list.aria,会话结果
+list.unknownProject,未知项目
+list.noPrompt,未找到用户 prompt
+list.messages,{count} 条消息
+detail.loading,正在加载详情...
+detail.empty,选择一个会话，查看 transcript 路径、预览和 resume 命令。
+detail.copyTitle,复制 resume 命令
+detail.copy,复制
+detail.copied,已复制
+detail.updated,更新时间
+detail.transcript,Transcript
+detail.sessionId,Session ID
+detail.match,命中片段
+detail.preview,预览
+detail.unknown,未知
+language.aria,语言

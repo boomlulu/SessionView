@@ -9,6 +9,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
+from . import i18n
 from . import services
 
 
@@ -56,7 +57,14 @@ def create_app(db_path: Optional[str] = None) -> FastAPI:
     def api_projects():
         return services.projects(effective_db)
 
+    @app.get("/api/i18n/languages")
+    def api_languages():
+        return i18n.list_languages()
+
     web_dist = Path(__file__).resolve().parent.parent / "web" / "dist"
+    locale_dir = i18n.locale_dir()
+    if locale_dir.exists():
+        app.mount("/locales", StaticFiles(directory=str(locale_dir)), name="locales")
     if web_dist.exists():
         app.mount("/assets", StaticFiles(directory=str(web_dist / "assets")), name="assets")
 

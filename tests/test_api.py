@@ -28,3 +28,13 @@ def test_api_scan_search_and_detail(tmp_path):
     detail = client.get("/api/sessions/sample-session")
     assert detail.status_code == 200
     assert detail.json()["resume_command"] == "claude --resume sample-session"
+
+
+def test_api_lists_csv_languages(tmp_path):
+    client = TestClient(create_app(str(tmp_path / "index.sqlite")))
+
+    response = client.get("/api/i18n/languages")
+
+    assert response.status_code == 200
+    codes = {item["code"] for item in response.json()}
+    assert {"en", "zh"}.issubset(codes)

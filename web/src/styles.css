@@ -61,7 +61,7 @@ select {
 
 .toolbar {
   display: grid;
-  grid-template-columns: minmax(180px, 1fr) minmax(160px, 260px) auto;
+  grid-template-columns: minmax(180px, 1fr) minmax(150px, 240px) minmax(100px, 150px) auto;
   gap: 10px;
 }
 
@@ -96,6 +96,7 @@ select,
 select {
   padding: 0 10px;
   color: #2d3430;
+  min-width: 0;
 }
 
 .iconButton {

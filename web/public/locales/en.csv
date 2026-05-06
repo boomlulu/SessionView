@@ -1,0 +1,36 @@
+key,value
+__language_name,English
+__language_native_name,English
+app.ready,Ready
+app.apiUnavailable,API unavailable
+app.scanning,Scanning transcripts
+app.scanFailed,Scan failed
+app.indexUnknown,Index unknown
+app.indexedSessions,"{count} indexed sessions"
+app.scanComplete,"Indexed {indexed} sessions from {files} files"
+brand.name,SessionView
+search.placeholder,Search sessions
+search.aria,Search sessions
+project.aria,Project
+project.all,All projects
+scan.title,Scan transcripts
+scan.button,Scan
+scan.scanning,Scanning
+status.loadingSessions,Loading sessions...
+status.noSessions,No sessions yet. Scan transcripts or try another keyword.
+list.aria,Session results
+list.unknownProject,unknown project
+list.noPrompt,No user prompt found
+list.messages,"{count} messages"
+detail.loading,Loading detail...
+detail.empty,Select a session to inspect its transcript path preview and resume command.
+detail.copyTitle,Copy resume command
+detail.copy,Copy
+detail.copied,Copied
+detail.updated,Updated
+detail.transcript,Transcript
+detail.sessionId,Session ID
+detail.match,Match
+detail.preview,Preview
+detail.unknown,unknown
+language.aria,Language

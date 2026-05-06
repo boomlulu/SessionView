@@ -4,8 +4,10 @@ import { getHealth, getProjects, getSession, scan, searchSessions, type Health, 
 import { SearchBar } from "./components/SearchBar";
 import { SessionDetailView } from "./components/SessionDetail";
 import { SessionList } from "./components/SessionList";
+import { useI18n } from "./i18n";
 
 export function App() {
+  const { language, languages, setLanguage, t } = useI18n();
   const [health, setHealth] = useState<Health | null>(null);
   const [projects, setProjects] = useState<string[]>([]);
   const [query, setQuery] = useState("");
@@ -17,7 +19,8 @@ export function App() {
   const [detailLoading, setDetailLoading] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [status, setStatus] = useState("Ready");
+  const [statusKey, setStatusKey] = useState("app.ready");
+  const [statusValues, setStatusValues] = useState<Record<string, string | number> | undefined>();
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -44,9 +47,9 @@ export function App() {
   }, [selectedId]);
 
   const indexLabel = useMemo(() => {
-    if (!health) return "Index unknown";
-    return `${health.session_count} indexed sessions`;
-  }, [health]);
+    if (!health) return t("app.indexUnknown");
+    return t("app.indexedSessions", { count: health.session_count });
+  }, [health, t]);
   const selectedSummary = sessions.find((item) => item.session_id === selectedId);
   const displayedDetail = detail
     ? {
@@ -60,11 +63,13 @@ export function App() {
       const [healthPayload, projectPayload] = await Promise.all([getHealth(), getProjects()]);
       setHealth(healthPayload);
       setProjects(projectPayload);
-      setStatus("Ready");
+      setStatusKey("app.ready");
+      setStatusValues(undefined);
       await runSearch();
     } catch (err) {
       setError(readableError(err));
-      setStatus("API unavailable");
+      setStatusKey("app.apiUnavailable");
+      setStatusValues(undefined);
       setLoading(false);
     }
   }
@@ -90,14 +95,17 @@ export function App() {
 
   async function handleScan() {
     setIsScanning(true);
-    setStatus("Scanning transcripts");
+    setStatusKey("app.scanning");
+    setStatusValues(undefined);
     try {
       const report = await scan(false);
-      setStatus(`Indexed ${report.indexed_sessions} sessions from ${report.scanned_files} files`);
       await refreshStatus();
+      setStatusKey("app.scanComplete");
+      setStatusValues({ indexed: report.indexed_sessions, files: report.scanned_files });
     } catch (err) {
       setError(readableError(err));
-      setStatus("Scan failed");
+      setStatusKey("app.scanFailed");
+      setStatusValues(undefined);
     } finally {
       setIsScanning(false);
     }
@@ -115,7 +123,7 @@ export function App() {
         <div className="brand">
           <Database size={22} aria-hidden="true" />
           <div>
-            <strong>SessionView</strong>
+            <strong>{t("brand.name")}</strong>
             <span>{indexLabel}</span>
           </div>
         </div>
@@ -123,22 +131,27 @@ export function App() {
           query={query}
           project={project}
           projects={projects}
+          language={language}
+          languages={languages}
           isScanning={isScanning}
+          t={t}
           onQueryChange={setQuery}
           onProjectChange={setProject}
+          onLanguageChange={setLanguage}
           onScan={handleScan}
         />
       </header>
-      <div className="statusBar">{status}</div>
+      <div className="statusBar">{t(statusKey, statusValues)}</div>
       <div className="contentGrid">
         <SessionList
           sessions={sessions}
           selectedId={selectedId}
           loading={loading}
           error={error}
+          t={t}
           onSelect={setSelectedId}
         />
-        <SessionDetailView detail={displayedDetail} loading={detailLoading} copied={copied} onCopy={handleCopy} />
+        <SessionDetailView detail={displayedDetail} loading={detailLoading} copied={copied} t={t} onCopy={handleCopy} />
       </div>
     </main>
   );

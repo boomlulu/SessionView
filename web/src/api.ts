@@ -40,6 +40,12 @@ export type ScanReport = {
   warnings: string[];
 };
 
+export type LanguageOption = {
+  code: string;
+  name: string;
+  native_name: string;
+};
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(path, {
     ...init,
@@ -60,6 +66,10 @@ export function getHealth() {
 
 export function getProjects() {
   return request<string[]>("/api/projects");
+}
+
+export function getLanguages() {
+  return request<LanguageOption[]>("/api/i18n/languages");
 }
 
 export function scan(rebuild = false) {
