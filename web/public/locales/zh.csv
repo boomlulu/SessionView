@@ -4,6 +4,7 @@ __language_native_name,中文
 app.ready,就绪
 app.apiUnavailable,API 不可用
 app.scanning,正在扫描会话
+app.scanningProject,正在扫描所选项目
 app.scanFailed,扫描失败
 app.indexUnknown,索引状态未知
 app.indexedSessions,已索引 {count} 个会话
@@ -25,9 +26,11 @@ scan.phase.done,扫描完成
 scan.phase.failed,扫描失败
 scan.progress,已处理 {scanned} / {total} 个文件
 scan.roots,扫描目录
+scan.deleteRootTitle,删除扫描目录
 scan.rootExists,存在
 scan.rootMissing,不存在
 scan.currentFile,当前文件
+scan.database,索引数据库
 scan.noCurrentFile,当前没有正在扫描的文件
 scan.counts,已索引 {indexed} 个会话，{warnings} 个 warning
 scan.warnings,{count} 个 warning

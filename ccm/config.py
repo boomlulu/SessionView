@@ -7,8 +7,9 @@ from typing import Iterable, List
 
 APP_DIR = Path(os.environ.get("CCM_HOME", "~/.cc-session-manager")).expanduser()
 DEFAULT_DB_PATH = Path(os.environ.get("CCM_DB", APP_DIR / "index.sqlite")).expanduser()
+RANCH_DEFAULT_ROOT = Path("/Users/boom/work/HWMain_2022_Ranch/Assets/LocalResources/Ranch")
 
-DEFAULT_SCAN_ROOTS = [
+DEFAULT_SCAN_ROOTS = [RANCH_DEFAULT_ROOT] if RANCH_DEFAULT_ROOT.exists() else [
     Path("~/.claude/projects").expanduser(),
     Path("~/.config/claude/projects").expanduser(),
 ]

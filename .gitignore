@@ -8,4 +8,6 @@ __pycache__/
 node_modules/
 web/node_modules/
 web/dist/
+logs/
+*.pid
 .DS_Store

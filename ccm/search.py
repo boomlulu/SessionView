@@ -27,7 +27,7 @@ def list_sessions(conn: sqlite3.Connection, project: Optional[str] = None, limit
         """,
         params,
     ).fetchall()
-    return [_session_row(row, snippet=row["first_user_text"]) for row in rows]
+    return [_session_row(row, snippet=None) for row in rows]
 
 
 def get_session(conn: sqlite3.Connection, session_id: str) -> Optional[Dict[str, Any]]:
@@ -62,7 +62,7 @@ def get_session(conn: sqlite3.Connection, session_id: str) -> Optional[Dict[str,
         """,
         (session_id,),
     ).fetchall()
-    payload = _session_row(row, snippet=row["first_user_text"])
+    payload = _session_row(row, snippet=None)
     payload["messages"] = [dict(message) for message in messages]
     payload["chunks"] = [dict(chunk) for chunk in chunks]
     return payload

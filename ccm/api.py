@@ -18,6 +18,10 @@ class ScanRequest(BaseModel):
     rebuild: bool = False
 
 
+class ScanRootRequest(BaseModel):
+    path: str
+
+
 def create_app(db_path: Optional[str] = None) -> FastAPI:
     app = FastAPI(title="Claude Code Session Manager")
     app.add_middleware(
@@ -29,6 +33,7 @@ def create_app(db_path: Optional[str] = None) -> FastAPI:
     )
 
     effective_db = db_path or services.DEFAULT_DB_PATH
+    services.refresh_scan_status_from_db(effective_db)
 
     @app.get("/api/health")
     def api_health():
@@ -43,8 +48,20 @@ def create_app(db_path: Optional[str] = None) -> FastAPI:
         return services.start_scan(request.roots, request.rebuild, effective_db)
 
     @app.get("/api/scan/status")
-    def api_scan_status():
+    async def api_scan_status():
         return services.scan_status(effective_db)
+
+    @app.get("/api/scan/roots")
+    def api_scan_roots():
+        return services.scan_roots(effective_db)
+
+    @app.post("/api/scan/roots")
+    def api_add_scan_root(request: ScanRootRequest):
+        return services.add_scan_root(request.path, effective_db)
+
+    @app.delete("/api/scan/roots")
+    def api_remove_scan_root(request: ScanRootRequest):
+        return services.remove_scan_root(request.path, effective_db)
 
     @app.get("/api/sessions")
     def api_sessions(project: Optional[str] = None, limit: int = 100):

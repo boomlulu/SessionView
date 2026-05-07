@@ -3,7 +3,7 @@ from pathlib import Path
 
 from ccm.index import index_session, init_db
 from ccm.parser import parse_transcript
-from ccm.search import get_session, list_projects, search_sessions
+from ccm.search import get_session, list_projects, list_sessions, search_sessions
 
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -45,3 +45,18 @@ def test_project_filter_and_detail():
     assert detail is not None
     assert detail["transcript_path"].endswith("second_session.jsonl")
     assert detail["message_count"] == 2
+
+
+def test_snippet_only_exists_for_keyword_search():
+    conn = make_conn()
+    index_session(conn, parse_transcript(FIXTURES / "sample_session.jsonl"))
+
+    listed = list_sessions(conn)
+    searched = search_sessions(conn, "orchid")
+    detail = get_session(conn, "sample-session")
+
+    assert listed[0]["first_user_text"]
+    assert listed[0]["snippet"] is None
+    assert searched[0]["snippet"] is not None
+    assert detail is not None
+    assert detail["snippet"] is None

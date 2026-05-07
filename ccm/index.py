@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from contextlib import nullcontext
 import json
 import sqlite3
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable, Iterator
 
+from .config import DEFAULT_SCAN_ROOTS
 from .models import ParsedMessage, ParsedSession
 
 
@@ -14,6 +17,10 @@ def connect(db_path: str | Path) -> sqlite3.Connection:
     conn = sqlite3.connect(str(path))
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
+    conn.execute("PRAGMA journal_mode = WAL")
+    conn.execute("PRAGMA synchronous = NORMAL")
+    conn.execute("PRAGMA temp_store = MEMORY")
+    conn.execute("PRAGMA wal_autocheckpoint = 1000")
     return conn
 
 
@@ -65,8 +72,22 @@ def init_db(conn: sqlite3.Connection) -> None:
         CREATE INDEX IF NOT EXISTS idx_sessions_project ON sessions(project_path);
         CREATE INDEX IF NOT EXISTS idx_messages_session ON messages(session_id);
         CREATE INDEX IF NOT EXISTS idx_chunks_session ON chunks(session_id);
+
+        CREATE TABLE IF NOT EXISTS settings (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS scan_roots (
+            path TEXT PRIMARY KEY,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            last_scanned_at TEXT NULL,
+            active INTEGER NOT NULL DEFAULT 1
+        );
         """
     )
+    _seed_default_scan_roots(conn)
     conn.commit()
 
 
@@ -82,8 +103,43 @@ def rebuild_db(conn: sqlite3.Connection) -> None:
     init_db(conn)
 
 
-def index_session(conn: sqlite3.Connection, session: ParsedSession) -> None:
-    with conn:
+def checkpoint(conn: sqlite3.Connection) -> None:
+    conn.execute("PRAGMA wal_checkpoint(PASSIVE)")
+
+
+def _seed_default_scan_roots(conn: sqlite3.Connection) -> None:
+    seeded = conn.execute("SELECT value FROM settings WHERE key = 'scan_roots_seeded_v2'").fetchone()
+    if seeded and seeded["value"] == "1":
+        return
+    now = datetime.now(timezone.utc).isoformat()
+    if DEFAULT_SCAN_ROOTS and DEFAULT_SCAN_ROOTS[0].exists():
+        legacy_defaults = [Path("~/.claude/projects").expanduser(), Path("~/.config/claude/projects").expanduser()]
+        for legacy_root in legacy_defaults:
+            conn.execute(
+                "UPDATE scan_roots SET active = 0, updated_at = ? WHERE path = ?",
+                (now, str(legacy_root)),
+            )
+    for root in DEFAULT_SCAN_ROOTS:
+        conn.execute(
+            """
+            INSERT INTO scan_roots (path, created_at, updated_at, active)
+            VALUES (?, ?, ?, 1)
+            ON CONFLICT(path) DO NOTHING
+            """,
+            (str(root), now, now),
+        )
+    conn.execute(
+        """
+        INSERT INTO settings (key, value)
+        VALUES ('scan_roots_seeded_v2', '1')
+        ON CONFLICT(key) DO UPDATE SET value = excluded.value
+        """
+    )
+
+
+def index_session(conn: sqlite3.Connection, session: ParsedSession, commit: bool = True) -> None:
+    context = conn if commit else nullcontext()
+    with context:
         conn.execute("DELETE FROM chunks_fts WHERE session_id = ?", (session.id,))
         conn.execute("DELETE FROM messages WHERE session_id = ?", (session.id,))
         conn.execute("DELETE FROM chunks WHERE session_id = ?", (session.id,))

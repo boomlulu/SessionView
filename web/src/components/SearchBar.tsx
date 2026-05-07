@@ -1,5 +1,6 @@
 import { RefreshCw, Search } from "lucide-react";
 import type { LanguageOption } from "../api";
+import { tailPath } from "../format";
 import type { TFunction } from "../i18n";
 
 type Props = {
@@ -44,7 +45,7 @@ export function SearchBar({
         <option value="">{t("project.all")}</option>
         {projects.map((item) => (
           <option key={item} value={item}>
-            {item}
+            {tailPath(item)}
           </option>
         ))}
       </select>

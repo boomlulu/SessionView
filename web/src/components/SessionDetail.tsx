@@ -1,7 +1,8 @@
 import { Clipboard, FileText } from "lucide-react";
 import type { SessionDetail } from "../api";
-import { highlightHtml, shortDate } from "../format";
+import { highlightHtml, shortDate, tailPath } from "../format";
 import type { TFunction } from "../i18n";
+import { MarkdownPreview } from "./MarkdownPreview";
 
 type Props = {
   detail: SessionDetail | null;
@@ -27,7 +28,9 @@ export function SessionDetailView({ detail, loading, copied, t, onCopy }: Props)
     <section className="detailPanel">
       <div className="detailHeader">
         <div>
-          <p className="eyebrow">{detail.project_path || t("list.unknownProject")}</p>
+          <p className="eyebrow" title={detail.project_path || undefined}>
+            {tailPath(detail.project_path) || t("list.unknownProject")}
+          </p>
           <h1>{detail.first_user_text || detail.session_id}</h1>
         </div>
         <span className="count">{t("list.messages", { count: detail.message_count })}</span>
@@ -71,7 +74,7 @@ export function SessionDetailView({ detail, loading, copied, t, onCopy }: Props)
               <span>{message.role}</span>
               <span>{shortDate(message.timestamp)}</span>
             </div>
-            <p>{message.text}</p>
+            <MarkdownPreview>{message.text}</MarkdownPreview>
           </article>
         ))}
       </div>

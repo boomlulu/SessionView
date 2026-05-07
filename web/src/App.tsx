@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Database } from "lucide-react";
 import {
+  deleteScanRoot,
   getHealth,
   getProjects,
   getScanStatus,
@@ -124,11 +125,21 @@ export function App() {
   }
 
   async function handleScan() {
+    await startScanForRoots(undefined, "app.scanning");
+  }
+
+  async function handleProjectChange(value: string) {
+    setProject(value);
+    if (!value) return;
+    await startScanForRoots([value], "app.scanningProject");
+  }
+
+  async function startScanForRoots(roots: string[] | undefined, statusKey: string) {
     setIsScanning(true);
-    setStatusKey("app.scanning");
+    setStatusKey(statusKey);
     setStatusValues(undefined);
     try {
-      const status = await startScan(false);
+      const status = await startScan(false, roots);
       setScanStatus(status);
       if (!status.running) {
         await finishScan(status);
@@ -168,6 +179,11 @@ export function App() {
     setStatusValues({ indexed: status.indexed_sessions, files: status.scanned_files });
   }
 
+  async function handleDeleteScanRoot(path: string) {
+    const roots = await deleteScanRoot(path);
+    setScanStatus((current) => (current ? { ...current, roots } : current));
+  }
+
   async function handleCopy(command: string) {
     await navigator.clipboard.writeText(command);
     setCopied(true);
@@ -193,13 +209,19 @@ export function App() {
           isScanning={isScanning}
           t={t}
           onQueryChange={setQuery}
-          onProjectChange={setProject}
+          onProjectChange={handleProjectChange}
           onLanguageChange={setLanguage}
           onScan={handleScan}
         />
       </header>
       <div className="statusBar">{t(statusKey, statusValues)}</div>
-      <ScanStatusPanel status={scanStatus} t={t} />
+      <ScanStatusPanel
+        status={scanStatus}
+        dbPath={health?.db_path ?? null}
+        disabled={isScanning}
+        t={t}
+        onDeleteRoot={handleDeleteScanRoot}
+      />
       <div className="contentGrid">
         <SessionList
           sessions={sessions}

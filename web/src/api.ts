@@ -40,10 +40,18 @@ export type ScanReport = {
   warnings: string[];
 };
 
+export type ScanRoot = {
+  path: string;
+  exists: boolean;
+  created_at: string | null;
+  updated_at: string | null;
+  last_scanned_at: string | null;
+};
+
 export type ScanStatus = {
   running: boolean;
   phase: "idle" | "starting" | "discovering" | "indexing" | "done" | "failed";
-  roots: { path: string; exists: boolean }[];
+  roots: ScanRoot[];
   total_files: number;
   scanned_files: number;
   indexed_sessions: number;
@@ -94,15 +102,22 @@ export function scan(rebuild = false) {
   });
 }
 
-export function startScan(rebuild = false) {
+export function startScan(rebuild = false, roots?: string[]) {
   return request<ScanStatus>("/api/scan/start", {
     method: "POST",
-    body: JSON.stringify({ rebuild })
+    body: JSON.stringify({ rebuild, roots })
   });
 }
 
 export function getScanStatus() {
   return request<ScanStatus>("/api/scan/status");
+}
+
+export function deleteScanRoot(path: string) {
+  return request<ScanRoot[]>("/api/scan/roots", {
+    method: "DELETE",
+    body: JSON.stringify({ path })
+  });
 }
 
 export function searchSessions(query: string, project: string) {

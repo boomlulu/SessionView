@@ -10,10 +10,21 @@
   box-sizing: border-box;
 }
 
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
 body {
   margin: 0;
   min-width: 320px;
-  min-height: 100vh;
+  min-height: 100%;
+}
+
+#root {
+  height: 100%;
+  min-height: 0;
 }
 
 button,
@@ -23,12 +34,15 @@ select {
 }
 
 .appShell {
-  min-height: 100vh;
+  height: 100dvh;
+  min-height: 0;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .topbar {
+  flex: 0 0 auto;
   display: grid;
   grid-template-columns: minmax(220px, 320px) 1fr;
   gap: 18px;
@@ -125,6 +139,7 @@ select {
 }
 
 .statusBar {
+  flex: 0 0 auto;
   min-height: 34px;
   padding: 8px 20px;
   color: #59645e;
@@ -133,6 +148,7 @@ select {
 }
 
 .scanPanel {
+  flex: 0 0 auto;
   display: grid;
   gap: 12px;
   padding: 14px 20px;
@@ -218,6 +234,31 @@ select {
   font-size: 12px;
 }
 
+.rootDelete {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: #68746d;
+  cursor: pointer;
+}
+
+.rootDelete:hover {
+  border-color: #d7ddd0;
+  background: #f3f6f0;
+  color: #a23f28;
+}
+
+.rootDelete:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
 .rootList .missingRoot {
   color: #9b4b31;
 }
@@ -256,13 +297,18 @@ select {
 .contentGrid {
   display: grid;
   grid-template-columns: minmax(300px, 440px) minmax(0, 1fr);
+  height: 100%;
   min-height: 0;
   flex: 1;
+  overflow: hidden;
 }
 
 .sessionList {
+  min-height: 0;
+  height: 100%;
   border-right: 1px solid #d9ddd2;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   background: #eef1ec;
 }
 
@@ -320,7 +366,8 @@ select {
 }
 
 .snippet,
-.meta {
+.meta,
+.sessionFoot {
   color: #59645e;
   font-size: 13px;
   line-height: 1.45;
@@ -333,6 +380,31 @@ select {
   overflow: hidden;
 }
 
+.sessionFoot {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  min-width: 0;
+  font-size: 12px;
+}
+
+.sessionFoot span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sessionFoot span:not(:first-child)::before {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  margin: 0 7px 2px 0;
+  border-radius: 50%;
+  background: #adb7ad;
+}
+
 mark,
 .snippet mark {
   background: #ffe58a;
@@ -343,7 +415,10 @@ mark,
 
 .detailPanel {
   min-width: 0;
-  overflow: auto;
+  min-height: 0;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: 22px 28px 40px;
   background: #fbfcf8;
 }
@@ -437,8 +512,7 @@ dd {
   margin: 0 0 24px;
 }
 
-.snippetBlock p,
-.message p {
+.snippetBlock p {
   margin: 0;
   line-height: 1.55;
   white-space: pre-wrap;
@@ -451,6 +525,116 @@ dd {
 
 .message {
   padding: 13px 15px;
+}
+
+.markdownPreview {
+  color: #171b19;
+  font-size: 14px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.markdownPreview > :first-child {
+  margin-top: 0;
+}
+
+.markdownPreview > :last-child {
+  margin-bottom: 0;
+}
+
+.markdownPreview p,
+.markdownPreview ul,
+.markdownPreview ol,
+.markdownPreview blockquote,
+.markdownPreview pre,
+.markdownPreview table {
+  margin: 0 0 10px;
+}
+
+.markdownPreview ul,
+.markdownPreview ol {
+  padding-left: 22px;
+}
+
+.markdownPreview li {
+  margin: 3px 0;
+}
+
+.markdownPreview h1,
+.markdownPreview h2,
+.markdownPreview h3,
+.markdownPreview h4 {
+  margin: 12px 0 8px;
+  line-height: 1.25;
+  letter-spacing: 0;
+}
+
+.markdownPreview h1 {
+  font-size: 20px;
+}
+
+.markdownPreview h2 {
+  font-size: 17px;
+}
+
+.markdownPreview h3,
+.markdownPreview h4 {
+  font-size: 15px;
+}
+
+.markdownPreview blockquote {
+  padding-left: 12px;
+  border-left: 3px solid #cbd7c4;
+  color: #4f5a54;
+}
+
+.markdownPreview code {
+  min-height: 0;
+  display: inline;
+  padding: 2px 5px;
+  border: 1px solid #d3d8ce;
+  border-radius: 5px;
+  background: #f1f4ee;
+  font-size: 13px;
+}
+
+.markdownPreview pre {
+  max-width: 100%;
+  overflow: auto;
+  padding: 12px;
+  border: 1px solid #d3d8ce;
+  border-radius: 8px;
+  background: #f1f4ee;
+}
+
+.markdownPreview pre code {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  white-space: pre;
+}
+
+.markdownPreview table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.markdownPreview th,
+.markdownPreview td {
+  padding: 6px 8px;
+  border: 1px solid #dce1d7;
+  text-align: left;
+  vertical-align: top;
+}
+
+.markdownPreview th {
+  background: #f1f4ee;
+}
+
+.markdownPreview input[type="checkbox"] {
+  margin-right: 6px;
 }
 
 .messageMeta {
@@ -513,4 +697,5 @@ dd {
     grid-template-columns: 1fr;
     gap: 4px;
   }
+
 }

@@ -4,6 +4,7 @@ __language_native_name,English
 app.ready,Ready
 app.apiUnavailable,API unavailable
 app.scanning,Scanning transcripts
+app.scanningProject,Scanning selected project
 app.scanFailed,Scan failed
 app.indexUnknown,Index unknown
 app.indexedSessions,"{count} indexed sessions"
@@ -25,9 +26,11 @@ scan.phase.done,Scan complete
 scan.phase.failed,Scan failed
 scan.progress,"{scanned} / {total} files"
 scan.roots,Scan roots
+scan.deleteRootTitle,Remove scan root
 scan.rootExists,found
 scan.rootMissing,missing
 scan.currentFile,Current file
+scan.database,Index database
 scan.noCurrentFile,No file is being scanned
 scan.counts,"{indexed} sessions indexed, {warnings} warnings"
 scan.warnings,"{count} warnings"
